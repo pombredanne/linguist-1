@@ -1,8 +1,9 @@
 Linguist
 ========
-[![Build Status](https://travis-ci.org/liluo/linguist.png)](https://travis-ci.org/liluo/linguist)
+[![Build Status](https://travis-ci.org/kkszysiu/linguist.png)](https://travis-ci.org/kkszysiu/linguist)
 
 Language Savant, Python clone of [github/linguist](https://github.com/github/linguist/).
+Fork of [liluo/linguist](https://github.com/liluo/linguist) by [liluo](https://github.com/liluo).
 
 ## Installation
 
@@ -36,7 +37,7 @@ FileBlob('test.py').language.name #=> 'Python'
 FileBlob('test_file').language.name #=> 'Python'
 ```
 
-See [linguist/libs/language.py](https://github.com/liluo/linguist/blob/master/linguist/libs/language.py) and [lib/linguist/languages.yml](https://github.com/liluo/linguist/blob/master/linguist/libs/languages.yml).
+See [kkszysiu/libs/language.py](https://github.com/kkszysiu/linguist/blob/master/linguist/libs/language.py) and [lib/linguist/languages.yml](https://github.com/kkszysiu/linguist/blob/master/linguist/libs/languages.yml).
 
 
 #### Syntax Highlighting
@@ -95,7 +96,7 @@ from linguist.libs.file_blob import FileBlob
 FileBlob('static/js/jquery-2.0.0.min.js').is_vendored #=> True
 ```
 
-See [BlobHelper#is_vendored](https://github.com/liluo/linguist/blob/master/linguist/libs/blob_helper.py#L279) and [linguist/libs/vendor.yml](https://github.com/liluo/linguist/blob/master/linguist/libs/vendor.yml).
+See [BlobHelper#is_vendored](https://github.com/kkszysiu/linguist/blob/master/linguist/libs/blob_helper.py#L279) and [linguist/libs/vendor.yml](https://github.com/kkszysiu/linguist/blob/master/linguist/libs/vendor.yml).
 
 #### Generated file detection
 
@@ -106,7 +107,7 @@ FileBlob('jquery-2.0.0.min.js').is_generated #=> True
 FileBlob('app.coffee').is_generated #=> True
 ```
 
-See [Generated#is_generated](https://github.com/liluo/linguist/blob/master/linguist/libs/generated.py).
+See [Generated#is_generated](https://github.com/kkszysiu/linguist/blob/master/linguist/libs/generated.py).
 
 
 ## Contributing
@@ -127,6 +128,12 @@ python run.py
 ```
 
 ## Changelog
+__v0.1.2 [2014-05-18]__
+* Updated language samples for better recognition.
+* Sync the latest version of github/linguist
+* Added identification of language by shebang
+* Updated tests
+* Replaced original charlockholmes library with newest one with better type detection
 
 __v0.1.0 [2013-11-19]__
 * Better performance, create && require scanner

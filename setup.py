@@ -3,16 +3,18 @@
 
 from setuptools import setup, find_packages
 
+long_description = open('README.md').read()
+
 setup(name='linguist',
-      version='0.2.0',
+      version='0.1.2',
       keywords=('linguist', 'detect', 'programming', 'language'),
       description='Language Savant',
-      long_description='Language Savant',
+      long_description=long_description,
       license='New BSD',
 
-      url='https://github.com/liluo/linguist',
-      author='liluo',
-      author_email='i@liluo.org',
+      url='https://github.com/kkszysiu/linguist',
+      author='Krzysztof "kkszysiu" Klinikowski',
+      author_email='kkszysiu@gmail.com',
 
       packages=find_packages(),
       include_package_data=True,
