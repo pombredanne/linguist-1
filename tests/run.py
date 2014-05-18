@@ -9,11 +9,13 @@ sys.path.insert(0, ROOT_DIR)
 
 from unittest import main, TestSuite, findTestCases
 
+
 def get_test_module_names():
     file_names = os.listdir(os.curdir)
     for fn in file_names:
         if fn.startswith('test') and fn.endswith('.py'):
             yield 'tests.' + fn[:-3]
+
 
 def suite():
     alltests = TestSuite()
@@ -23,7 +25,6 @@ def suite():
         alltests.addTest(findTestCases(module))
 
     return alltests
-
 
 if __name__ == '__main__':
     main(defaultTest='suite')

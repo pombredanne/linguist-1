@@ -3,6 +3,7 @@
 from pygments.lexers import find_lexer_class
 from framework import LinguistTestBase, main
 from libs.language import Language
+from libs.samples import Samples
 
 
 colorize = """<div class="highlight"><pre><span class="k">def</span> <span class="nf">foo</span>
@@ -13,9 +14,44 @@ colorize = """<div class="highlight"><pre><span class="k">def</span> <span class
 
 
 class TestLanguage(LinguistTestBase):
+    SHEBANG_EXAMPLES = {
+        None: [
+            '',
+            'foo',
+            '#bar',
+            '#baz',
+            '///',
+            '\n\n\n\n\n',
+            ' #!/usr/sbin/ruby',
+            '\n#!/usr/sbin/ruby'
+        ],
+        'Ruby': [
+            '#!/usr/bin/env ruby\n# baz',
+            '#!/usr/sbin/ruby\n# bar',
+            '#!/usr/bin/ruby\n# foo',
+            '#!/usr/sbin/ruby',
+            '#!/usr/sbin/ruby foo bar baz\n'
+        ],
+        'R': [
+            '#!/usr/bin/env Rscript\n# example R script\n#\n'
+        ],
+        'Shell': [
+            '#!/usr/bin/bash\n',
+            '#!/bin/sh'
+        ],
+        'Python': [
+            '#!/bin/python\n# foo\n# bar\n# baz',
+            '#!/usr/bin/python2.7\n\n\n\n',
+            '#!/usr/bin/python3\n\n\n\n'
+        ],
+        'Common Lisp': [
+            '#!/usr/bin/sbcl --script\n\n'
+        ]
+    }
 
     def test_lexer(self):
         assert find_lexer_class('ActionScript 3') == Language['ActionScript'].lexer
+        assert find_lexer_class('AspectJ') == Language['AspectJ'].lexer
         assert find_lexer_class('Bash') == Language['Gentoo Ebuild'].lexer
         assert find_lexer_class('Bash') == Language['Gentoo Eclass'].lexer
         assert find_lexer_class('Bash') == Language['Shell'].lexer
@@ -46,6 +82,7 @@ class TestLanguage(LinguistTestBase):
         assert find_lexer_class('REBOL') == Language['Rebol'].lexer
         assert find_lexer_class('RHTML') == Language['HTML+ERB'].lexer
         assert find_lexer_class('RHTML') == Language['RHTML'].lexer
+        assert find_lexer_class('Ruby') == Language['Crystal'].lexer
         assert find_lexer_class('Ruby') == Language['Mirah'].lexer
         assert find_lexer_class('Ruby') == Language['Ruby'].lexer
         assert find_lexer_class('S') == Language['R'].lexer
@@ -58,7 +95,7 @@ class TestLanguage(LinguistTestBase):
         assert find_lexer_class('verilog') == Language['Verilog'].lexer
         assert find_lexer_class('XSLT') == Language['XSLT'].lexer
         assert find_lexer_class('aspx-vb') == Language['ASP'].lexer
-        # assert find_lexer_class('haXe') == Language['Haxe'].lexer
+        #assert find_lexer_class('haXe') == Language['Haxe'].lexer
         assert find_lexer_class('reStructuredText') == Language['reStructuredText'].lexer
 
     def test_find_by_alias(self):
@@ -108,6 +145,7 @@ class TestLanguage(LinguistTestBase):
         assert Language['Raw token data'] == Language.find_by_alias('raw')
         assert Language['Ruby'] == Language.find_by_alias('rb')
         assert Language['Ruby'] == Language.find_by_alias('ruby')
+        assert Language['R'] == Language.find_by_alias('r')
         assert Language['Scheme'] == Language.find_by_alias('scheme')
         assert Language['Shell'] == Language.find_by_alias('bash')
         assert Language['Shell'] == Language.find_by_alias('sh')
@@ -188,9 +226,14 @@ class TestLanguage(LinguistTestBase):
 
     def test_markup(self):
         assert 'markup' == Language['HTML'].type
+        assert 'markup' == Language['SCSS'].type
 
     def test_data(self):
         assert 'data' == Language['YAML'].type
+
+    def test_prose(self):
+        assert 'prose' == Language['Markdown'].type
+        assert 'prose' == Language['Org'].type
 
     def test_other(self):
         assert None == Language['Brainfuck'].type
@@ -199,7 +242,7 @@ class TestLanguage(LinguistTestBase):
     def test_searchable(self):
         assert True == Language['Ruby'].is_searchable
         assert False == Language['Gettext Catalog'].is_searchable
-        assert False == Language['SQL'].is_searchable
+        assert True == Language['SQL'].is_searchable
 
     def test_find_by_name(self):
         assert Language['Ruby'] == Language.name_index['Ruby']
@@ -233,6 +276,18 @@ class TestLanguage(LinguistTestBase):
         assert [Language['Clojure']] == Language.find_by_filename('riemann.config')
         assert [Language['HTML+Django']] == Language.find_by_filename('index.jinja')
 
+    def test_find_by_shebang(self):
+        assert 'ruby' == Samples.interpreter_from_shebang("#!/usr/bin/ruby\n# baz")
+
+        for key, shebangs in self.SHEBANG_EXAMPLES.iteritems():
+            for shebang in shebangs:
+                language = Language.find_by_shebang(shebang)
+                print Language[key], language
+                if key is None:
+                    self.assertEqual(Language[key], language)
+                else:
+                    self.assertTrue(Language[key] in language)
+
     def test_find(self):
         assert 'Ruby' == Language['Ruby'].name
         assert 'Ruby' == Language['ruby'].name
@@ -262,7 +317,7 @@ class TestLanguage(LinguistTestBase):
     def test_color(self):
         assert '#701516' == Language['Ruby'].color
         assert '#3581ba' == Language['Python'].color
-        assert '#f15501' == Language['JavaScript'].color
+        assert '#f1e05a' == Language['JavaScript'].color
         assert '#31859c' == Language['TypeScript'].color
 
     def test_colors(self):

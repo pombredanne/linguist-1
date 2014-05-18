@@ -64,6 +64,7 @@ class TestFileBob(LinguistTestBase):
     def test_lines(self):
         assert ["module Foo", "end", ""] == self.blob("Ruby/foo.rb").lines
         assert ["line 1", "line 2", ""] == self.blob("Text/mac.txt").lines
+        assert 475 == len(self.blob("Emacs Lisp/ess-julia.el").lines)
 
     def test_size(self):
         assert 15 == self.blob("Ruby/foo.rb").size
@@ -164,8 +165,14 @@ class TestFileBob(LinguistTestBase):
         # TypeScript-is_generated JS
         # TODO
 
+        # Composer generated composer.lock file
+        assert self.blob("JSON/composer.lock").is_generated
+
         # PEG.js-is_generated parsers
         assert self.blob("JavaScript/parser.js").is_generated
+
+        # Generated PostScript
+        assert not self.blob("PostScript/sierpinski.ps").is_generated
 
         # These examples are too basic to tell
         assert not self.blob("JavaScript/empty.js").is_generated
@@ -190,6 +197,9 @@ class TestFileBob(LinguistTestBase):
         assert not self.blob("CSS/bootstrap.css").is_generated
         assert self.blob("CSS/bootstrap.min.css").is_generated
 
+        # Generated VCR
+        assert self.blob("YAML/vcr_cassette.yml").is_generated
+
     def test_vendored(self):
         assert not self.blob("Text/README").is_vendored
         assert not self.blob("ext/extconf.rb").is_vendored
@@ -198,7 +208,12 @@ class TestFileBob(LinguistTestBase):
         assert self.blob("dependencies/windows/headers/GL/glext.h").is_vendored
 
         # Node depedencies
-        assert  self.blob("node_modules/coffee-script/lib/coffee-script.js").is_vendored
+        assert self.blob("node_modules/coffee-script/lib/coffee-script.js").is_vendored
+
+        # Bower Components
+        assert self.blob("bower_components/custom/custom.js").is_vendored
+        assert self.blob("app/bower_components/custom/custom.js").is_vendored
+        assert self.blob("vendor/assets/bower_components/custom/custom.js").is_vendored
 
         # Rails vendor/
         assert  self.blob("vendor/plugins/will_paginate/lib/will_paginate.rb").is_vendored
@@ -250,31 +265,43 @@ class TestFileBob(LinguistTestBase):
         assert self.blob("ui/minified/jquery.ui.accordion.min.js").is_vendored
 
         # MooTools
-        assert  self.blob("public/javascripts/mootools-core-1.3.2-full-compat.js").is_vendored
-        assert  self.blob("public/javascripts/mootools-core-1.3.2-full-compat-yc.js").is_vendored
+        assert self.blob("public/javascripts/mootools-core-1.3.2-full-compat.js").is_vendored
+        assert self.blob("public/javascripts/mootools-core-1.3.2-full-compat-yc.js").is_vendored
 
         # Dojo
-        assert  self.blob("public/javascripts/dojo.js").is_vendored
+        assert self.blob("public/javascripts/dojo.js").is_vendored
 
         # MochiKit
-        assert  self.blob("public/javascripts/MochiKit.js").is_vendored
+        assert self.blob("public/javascripts/MochiKit.js").is_vendored
 
         # YUI
-        assert  self.blob("public/javascripts/yahoo-dom-event.js").is_vendored
-        assert  self.blob("public/javascripts/yahoo-min.js").is_vendored
-        assert  self.blob("public/javascripts/yuiloader-dom-event.js").is_vendored
+        assert self.blob("public/javascripts/yahoo-dom-event.js").is_vendored
+        assert self.blob("public/javascripts/yahoo-min.js").is_vendored
+        assert self.blob("public/javascripts/yuiloader-dom-event.js").is_vendored
 
         # WYS editors
-        assert  self.blob("public/javascripts/ckeditor.js").is_vendored
-        assert  self.blob("public/javascripts/tiny_mce.js").is_vendored
-        assert  self.blob("public/javascripts/tiny_mce_popup.js").is_vendored
-        assert  self.blob("public/javascripts/tiny_mce_src.js").is_vendored
+        assert self.blob("public/javascripts/ckeditor.js").is_vendored
+        assert self.blob("public/javascripts/tiny_mce.js").is_vendored
+        assert self.blob("public/javascripts/tiny_mce_popup.js").is_vendored
+        assert self.blob("public/javascripts/tiny_mce_src.js").is_vendored
+
+        # AngularJS
+        assert self.blob("public/javascripts/angular.js").is_vendored
+        assert self.blob("public/javascripts/angular.min.js").is_vendored
+
+        # D3.js
+        assert self.blob("public/javascripts/d3.v3.js").is_vendored
+        assert self.blob("public/javascripts/d3.v3.min.js").is_vendored
+
+        # Modernizr
+        assert self.blob("public/javascripts/modernizr-2.7.1.js").is_vendored
+        assert self.blob("public/javascripts/modernizr.custom.01009.js").is_vendored
 
         # Fabric
-        assert  self.blob("fabfile.py").is_vendored
+        assert self.blob("fabfile.py").is_vendored
 
         # WAF
-        assert  self.blob("waf").is_vendored
+        assert self.blob("waf").is_vendored
 
         # Visual Studio IntelliSense
         assert  self.blob("Scripts/jquery-1.7-vsdoc.js").is_vendored
@@ -310,6 +337,14 @@ class TestFileBob(LinguistTestBase):
 
         # Vagrant
         assert self.blob("Vagrantfile").is_vendored
+
+        # Gradle
+        assert self.blob("gradlew").is_vendored
+        assert self.blob("gradlew.bat").is_vendored
+        assert self.blob("gradle/wrapper/gradle-wrapper.properties").is_vendored
+        assert self.blob("subproject/gradlew").is_vendored
+        assert self.blob("subproject/gradlew.bat").is_vendored
+        assert self.blob("subproject/gradle/wrapper/gradle-wrapper.properties").is_vendored
 
     def test_language(self):
         def _check_lang(sample):

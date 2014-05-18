@@ -101,13 +101,16 @@ class Classifier(object):
         scores = {}
         if self.verbosity >= 2:
             self.dump_all_tokens(tokens, languages)
+
         for language in languages:
             scores[language] = self.tokens_probability(tokens, language) + self.language_probability(language)
             if self.verbosity >= 1:
-                print '%10s = %10.3f + %7.3f = %10.3f\n' % (language,
-                                                            self.tokens_probability(tokens, language),
-                                                            self.language_probability(language),
-                                                            scores[language])
+                print '%10s = %10.3f + %7.3f = %10.3f\n' % (
+                    language,
+                    self.tokens_probability(tokens, language),
+                    self.language_probability(language),
+                    scores[language]
+                )
         return sorted(scores.iteritems(), key=lambda t: t[1], reverse=True)
 
     def tokens_probability(self, tokens, language):
@@ -120,7 +123,11 @@ class Classifier(object):
         Returns Float between 0.0 and 1.0.
         """
         token_probability = partial(self.token_probability, language=language)
-        return reduce(lambda x, y: x + math.log(token_probability(y)), tokens, 0.0)
+        return reduce(
+            lambda x, y: x + math.log(token_probability(y)),
+            tokens,
+            0.0
+        )
 
     def token_probability(self, token, language=''):
         """
@@ -145,7 +152,9 @@ class Classifier(object):
 
         Returns Float between 0.0 and 1.0.
         """
-        return math.log(float(self.languages[language]) / float(self.languages_total))
+        return math.log(
+            float(self.languages[language]) / float(self.languages_total)
+        )
 
     def dump_all_tokens(self, tokens, languages):
         """

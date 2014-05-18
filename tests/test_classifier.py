@@ -3,9 +3,14 @@
 from framework import LinguistTestBase, main
 from libs.classifier import Classifier
 from libs.tokenizer import Tokenizer
-from libs.samples import DATA
+from libs.language import Language
+from libs.samples import Samples, DATA
 
-TEST_FILE = "../samples/%s"
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+TEST_FILE = '{base_dir}/samples/%s'.format(base_dir=BASE_DIR)
+
 
 class TestClassifier(LinguistTestBase):
 
@@ -46,17 +51,19 @@ class TestClassifier(LinguistTestBase):
         assert [] == Classifier.classify(DATA, None)
 
     def test_classify_ambiguous_languages(self):
-        #TODO
-        """
-        Samples.each do |sample|
-          language  = Linguist::Language.find_by_name(sample[:language])
-          languages = Language.find_by_filename(sample[:path]).map(&:name)
-          next unless languages.length > 1
+        def classify_ambiguous_languages(sample):
+            language = Language.find_by_name(sample['language'])
+            languages = Language.find_by_filename(sample['path'])
+            languages_names = [x.name for x in languages]
 
-          results = Classifier.classify(Samples::DATA, File.read(sample[:path]), languages)
-          assert_equal language.name, results.first[0], "#{sample[:path]}\n#{results.inspect}"
-        end
-        """
+            results = Classifier.classify(DATA, open(sample['path']).read(), languages_names)
+
+            self.assertEqual(language.name, results[0][0])
+
+        samples = Samples()
+        samples.generate()
+        samples.each(classify_ambiguous_languages)
+
 
 if __name__ == '__main__':
     main()

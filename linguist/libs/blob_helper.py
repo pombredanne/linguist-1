@@ -6,7 +6,7 @@ from os.path import realpath, dirname, splitext, basename, join
 
 import yaml
 import mime
-import charlockholmes
+import pycharlockholmes
 from pygments import lexers
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
@@ -19,7 +19,10 @@ MEGABYTE = 1024 * 1024
 DIR = dirname(realpath(__file__))
 VENDOR_PATH = join(DIR, "vendor.yml")
 VENDORED_PATHS = yaml.load(open(VENDOR_PATH))
-VENDORED_REGEXP = re.compile('|'.join(VENDORED_PATHS))
+# prevent
+# 'sorry, but this version only supports 100 named groups' Assertion Error
+VENDORED_REGEXP1 = re.compile('|'.join(VENDORED_PATHS[:50]))
+VENDORED_REGEXP2 = re.compile('|'.join(VENDORED_PATHS[50:100]))
 
 
 class BlobHelper(object):
@@ -156,7 +159,7 @@ class BlobHelper(object):
             return self._detect_encoding
 
         if self.data:
-            self._detect_encoding = charlockholmes.detect(self.data)
+            self._detect_encoding = pycharlockholmes.detect(self.data)
             return self._detect_encoding
 
     @property
@@ -299,7 +302,9 @@ class BlobHelper(object):
 
         Return true or false
         """
-        if VENDORED_REGEXP.search(self.name):
+        if VENDORED_REGEXP1.search(self.name):
+            return True
+        if VENDORED_REGEXP2.search(self.name):
             return True
 
     @property

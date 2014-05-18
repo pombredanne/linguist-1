@@ -11,7 +11,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 
 from classifier import Classifier
-from samples import DATA
+from samples import Samples, DATA
 
 DIR = dirname(realpath(__file__))
 POPULAR_PATH = join(DIR, "popular.yml")
@@ -39,21 +39,22 @@ class Language(object):
     index = {}
     name_index = {}
     alias_index = {}
+
     extension_index = defaultdict(list)
     filename_index = defaultdict(list)
-    primary_extension_index = {}
+    interpreter_index = defaultdict(list)
 
     _colors = []
     _ace_modes = []
 
     # Valid Languages types
-    TYPES = ('data', 'markup', 'programming')
+    TYPES = ('data', 'markup', 'programming', 'prose')
 
     @staticmethod
     def detectable_markup():
         # Names of non-programming languages that we will still detect
         # Returns an array
-        return ["CSS", "Less", "Sass", "TeX"]
+        return 'CSS', 'Less', 'Sass', 'SCSS', 'Stylus', 'TeX'
 
     @classmethod
     def create(cls, attributes={}):
@@ -80,9 +81,8 @@ class Language(object):
                 raise ValueError("Extension is missing a '.': %s" % extension)
             cls.extension_index[extension].append(language)
 
-        if language.primary_extension in cls.primary_extension_index:
-            raise ValueError("Duplicate primary extension: %s" % language.primary_extension)
-        cls.primary_extension_index[language.primary_extension] = language
+        for interpreter in language.interpreters:
+            cls.interpreter_index[interpreter].append(language)
 
         for filename in language.filenames:
             cls.filename_index[filename].append(language)
@@ -120,14 +120,7 @@ class Language(object):
         # Set extensions or default to [].
         self.extensions = attributes.get('extensions', [])
         self.filenames = attributes.get('filenames', [])
-
-        self.primary_extension = attributes.get('primary_extension')
-        if not self.primary_extension:
-            raise KeyError('%s is missing primary extension' % self.name)
-
-        # Prepend primary extension unless its already included
-        if self.primary_extension not in self.extensions:
-            self.extensions = [self.primary_extension] + self.extensions
+        self.interpreters = attributes.get('interpreters', [])
 
         # Set popular, and searchable flags
         self.popular = attributes.get('popular', False)
@@ -177,11 +170,27 @@ class Language(object):
         """
         name, extname = basename(filename), splitext(filename)[1]
 
-        lang = cls.primary_extension_index.get(extname)
-        langs = lang and [lang] or []
+        langs = []
         langs.extend(cls.filename_index.get(name, []))
         langs.extend(cls.extension_index.get(extname, []))
         return list(set(langs))
+
+    @classmethod
+    def find_by_shebang(cls, data):
+        """
+        Public: Look up Languages by shebang line.
+
+        data - Array of tokens or String data to analyze.
+
+        Examples
+
+        Language.find_by_shebang("#!/bin/bash\ndate;")
+        # => [#<Language name="Bash">]
+
+        Returns the matching Language
+        """
+        interpreter = Samples.interpreter_from_shebang(data)
+        return cls.interpreter_index.get(interpreter)
 
     @classmethod
     def find_by_alias(cls, name):
@@ -262,6 +271,22 @@ class Language(object):
     def colorize(self, text, options={}):
         return highlight(text, self.lexer(), HtmlFormatter(**options))
 
+    # Deprecated: Get primary extension
+    #
+    # Defaults to the first extension but can be overridden
+    # in the languages.yml.
+    #
+    # The primary extension can not be nil. Tests should verify this.
+    #
+    # This method is only used by app/helpers/gists_helper.rb for creating
+    # the language dropdown. It really should be using `name` instead.
+    # Would like to drop primary extension.
+    #
+    # Returns the extension String.
+    @property
+    def primary_extension(self):
+        return self.extensions[0]
+
     @property
     def group(self):
         return self._group or self.find_by_name(self.group_name)
@@ -318,11 +343,16 @@ class Language(object):
 
 extensions = DATA['extnames']
 filenames = DATA['filenames']
+interpreters = DATA['interpreters']
 popular = POPULAR
+
+if not interpreters:
+    interpreters = {}
 
 for name, options in sorted(LANGUAGES.iteritems(), key=lambda k: k[0]):
     options['extensions'] = options.get('extensions', [])
     options['filenames'] = options.get('filenames', [])
+    options['interpreters'] = options.get('interpreters', [])
 
     def _merge(data, item_name):
         items = data.get(name, [])
@@ -332,6 +362,7 @@ for name, options in sorted(LANGUAGES.iteritems(), key=lambda k: k[0]):
 
     _merge(extensions, 'extensions')
     _merge(filenames, 'filenames')
+    _merge(interpreters, 'interpreters')
 
     Language.create(dict(name=name,
                          color=options.get('color'),
@@ -343,7 +374,7 @@ for name, options in sorted(LANGUAGES.iteritems(), key=lambda k: k[0]):
                          group_name=options.get('group'),
                          searchable=options.get('searchable', True),
                          search_term=options.get('search_term'),
-                         extensions=sorted(options['extensions']),
-                         primary_extension=options.get('primary_extension'),
+                         extensions=[options['extensions'][0]]+sorted(options['extensions'][1:]),
+                         interpreters=sorted(options.get('interpreters')),
                          filenames=options['filenames'],
                          popular=name in popular))
