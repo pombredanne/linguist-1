@@ -28,21 +28,21 @@ def detech_blob(path):
     else:
         type = 'Binary'
 
-    print '%s: %s lines (%s sloc)' % (blob.name, blob.loc, blob.sloc)
-    print '  type: %s' % type
-    print '  language: %s' % (blob.language and blob.language.name)
+    print('%s: %s lines (%s sloc)' % (blob.name, blob.loc, blob.sloc))
+    print('  type: %s' % type)
+    print('  language: %s' % (blob.language and blob.language.name))
 
     if blob.is_large:
-        print '  blob is too large to be shown'
+        print('  blob is too large to be shown')
     if blob.is_generated:
-        print '  appears to be generated source code'
+        print('  appears to be generated source code')
     if blob.is_vendored:
-        print '  appears to be a vendored file'
+        print('  appears to be a vendored file')
 
 
 def detech(path):
     if not os.path.exists(path):
-        print '%s does not exist.'
+        print('%s does not exist.')
         return
 
     if os.path.isdir(path):
