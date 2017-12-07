@@ -35,8 +35,8 @@ MULTI_LINE_COMMENTS = [
 MULTI_LINE_COMMENT_DICT = dict([(s, StringRegexp(escape(e)))
                                 for s, e in MULTI_LINE_COMMENTS])
 
-START_SINGLE_LINE_COMMENT = StringRegexp('|'.join(['\s*%s ' % escape(c) for c in SINGLE_LINE_COMMENTS]))
-START_MULTI_LINE_COMMENT = StringRegexp('|'.join([escape(c[0]) for c in MULTI_LINE_COMMENTS]))
+START_SINGLE_LINE_COMMENT = StringRegexp('|'.join(map(lambda c: '\s*%s ' % escape(c), SINGLE_LINE_COMMENTS)))
+START_MULTI_LINE_COMMENT = StringRegexp('|'.join(map(lambda c: escape(c[0]), MULTI_LINE_COMMENTS)))
 
 
 REGEX_SHEBANG = StringRegexp(r'^#!.+')

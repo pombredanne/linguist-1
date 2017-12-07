@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-import urllib.request, urllib.parse, urllib.error
+import urllib
 from os.path import realpath, dirname, basename, splitext, join
 from collections import defaultdict
 import pdb
@@ -27,13 +27,15 @@ class ItemMeta(type):
         return cls.find_by_name(item)
 
 
-class Language(object, metaclass=ItemMeta):
+class Language(object):
     """
     Language names that are recognizable by GitHub. Defined languages
     can be highlighted, searched and listed under the Top Languages page.
 
     Languages are defined in `lib/linguist/languages.yml`.
     """
+
+    __metaclass__ = ItemMeta
     languages = []
     index = {}
     name_index = {}
@@ -202,14 +204,14 @@ class Language(object, metaclass=ItemMeta):
     def colors(cls):
         if cls._colors:
             return cls._colors
-        cls._colors = sorted([l for l in cls.all() if l.color], key=lambda l: l.name.lower())
+        cls._colors = sorted(filter(lambda l: l.color, cls.all()), key=lambda l: l.name.lower())
         return cls._colors
 
     @classmethod
     def ace_modes(cls):
         if cls._ace_modes:
             return cls._ace_modes
-        cls._ace_modes = sorted([l for l in cls.all() if l.ace_mode], key=lambda l: l.name.lower())
+        cls._ace_modes = sorted(filter(lambda l: l.ace_mode, cls.all()), key=lambda l: l.name.lower())
         return cls._ace_modes
 
     @classmethod
@@ -316,13 +318,13 @@ class Language(object, metaclass=ItemMeta):
 
         Returns the escaped String.
         """
-        return urllib.parse.quote(self.name, '')
+        return urllib.quote(self.name, '')
 
 extensions = DATA['extnames']
 filenames = DATA['filenames']
 popular = POPULAR
 
-for name, options in sorted(list(LANGUAGES.items()), key=lambda k: k[0]):
+for name, options in sorted(LANGUAGES.items(), key=lambda k: k[0]):
     options['extensions'] = options.get('extensions', [])
     options['filenames'] = options.get('filenames', [])
 

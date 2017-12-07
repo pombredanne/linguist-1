@@ -44,7 +44,7 @@ class Repository(object):
         Returns a Repository
         """
         blob = partial(FileBlob, base_path=base_path)
-        enum = list(map(blob, cls.get_files(base_path)))
+        enum = map(blob, cls.get_files(base_path))
         return cls(enum)
 
     @staticmethod
@@ -118,10 +118,10 @@ class Repository(object):
                 self.sizes[blob.language.group] += blob.size
 
         # Compute total size
-        self._size = sum(self.sizes.values())
+        self._size = sum(self.sizes.itervalues())
 
         # Get primary language
-        primary = sorted(list(self.sizes.items()), key=lambda t: t[1], reverse=True)
+        primary = sorted(self.sizes.items(), key=lambda t: t[1], reverse=True)
         if primary:
             self._language = primary[0][0]
 

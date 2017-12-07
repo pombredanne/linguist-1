@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-import urllib.request, urllib.parse, urllib.error
+import urllib
 from os.path import realpath, dirname, splitext, basename, join
 
 import yaml
@@ -136,7 +136,7 @@ class BlobHelper(object):
         elif self.name is None:
             return 'attachment'
         else:
-            return 'attachment; filename=%s' % urllib.parse.quote_plus(basename(self.name))
+            return 'attachment; filename=%s' % urllib.quote_plus(basename(self.name))
 
     @property
     def encoding(self):
@@ -248,7 +248,7 @@ class BlobHelper(object):
 
         Returns Integer
         """
-        return len(list(filter(re.compile('\S').search, self.lines)))
+        return len(filter(re.compile('\S').search, self.lines))
 
     @property
     def is_safe_to_colorize(self):
