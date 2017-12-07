@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from os import stat
-from blob_helper import BlobHelper
+from linguist.libs.blob_helper import BlobHelper
 
 
 class FileBlob(BlobHelper):
@@ -68,7 +68,7 @@ class FileBlob(BlobHelper):
         """
         if hasattr(self, '_data'):
             return self._data
-        self._data = file(self.path).read()
+        self._data = open(self.path).read()
         return self._data
 
     @property

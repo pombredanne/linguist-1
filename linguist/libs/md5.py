@@ -26,7 +26,7 @@ class MD5(object):
 
         elif isinstance(obj, dict):
             digest.update(obj.__class__.__name__)
-            hexs = [cls.hexdigest([k, v]) for k, v in obj.iteritems()]
+            hexs = [cls.hexdigest([k, v]) for k, v in obj.items()]
             hexs.sort()
             for e in hexs:
                 digest.update(e)

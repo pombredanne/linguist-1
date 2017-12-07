@@ -11,8 +11,8 @@ from pygments import lexers
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 
-from language import Language
-from generated import Generated
+from linguist.libs.language import Language
+from linguist.libs.generated import Generated
 
 MEGABYTE = 1024 * 1024
 
@@ -156,7 +156,7 @@ class BlobHelper(object):
             return self._detect_encoding
 
         if self.data:
-            self._detect_encoding = charlockholmes.detect(self.data)
+            self._detect_encoding = charlockholmes.detect(str.encode(self.data))
             return self._detect_encoding
 
     @property
@@ -353,7 +353,7 @@ class BlobHelper(object):
             return self._language
 
         _data = getattr(self, '_data', False)
-        if _data and isinstance(_data, basestring):
+        if _data and isinstance(_data, str):
             data = _data
         else:
             data = lambda: '' if (self.is_binary_mime_type or self.is_binary) else self.data

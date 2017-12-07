@@ -4,14 +4,15 @@ import re
 import urllib
 from os.path import realpath, dirname, basename, splitext, join
 from collections import defaultdict
+import pdb
 
 import yaml
 from pygments import lexers
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 
-from classifier import Classifier
-from samples import DATA
+from linguist.libs.classifier import Classifier
+from linguist.libs.samples import DATA
 
 DIR = dirname(realpath(__file__))
 POPULAR_PATH = join(DIR, "popular.yml")
@@ -108,7 +109,7 @@ class Language(object):
         # Lookup Lexer object
         lexer = attributes.get('lexer') or self.name
         self.lexer = lexers.find_lexer_class(lexer)
-        if not self.lexer:
+        if self.lexer == False:
             raise TypeError('%s is missing lexer' % self.name)
 
         self.ace_mode = attributes['ace_mode']
@@ -181,7 +182,7 @@ class Language(object):
         langs = lang and [lang] or []
         langs.extend(cls.filename_index.get(name, []))
         langs.extend(cls.extension_index.get(extname, []))
-        return list(set(langs))
+        return list(langs)
 
     @classmethod
     def find_by_alias(cls, name):
@@ -239,7 +240,7 @@ class Language(object):
         classified with other languages that have shebang scripts.
         """
         extname = splitext(name)[1]
-        if not extname and mode and (int(mode, 8) & 05 == 05):
+        if not extname and mode and (int(mode, 8) & 5 == 5):
             name += ".script!"
 
         possible_languages = cls.find_by_filename(name)
@@ -256,8 +257,11 @@ class Language(object):
 
         _pns = [p.name for p in possible_languages]
         result = Classifier.classify(DATA, data, _pns)
+        #pdb.set_trace()
+
         if result:
-            return cls[result[0][0]]
+            return cls.languages.append(result[0][0])
+            #return cls[result[0][0]]
 
     def colorize(self, text, options={}):
         return highlight(text, self.lexer(), HtmlFormatter(**options))
@@ -320,7 +324,7 @@ extensions = DATA['extnames']
 filenames = DATA['filenames']
 popular = POPULAR
 
-for name, options in sorted(LANGUAGES.iteritems(), key=lambda k: k[0]):
+for name, options in sorted(LANGUAGES.items(), key=lambda k: k[0]):
     options['extensions'] = options.get('extensions', [])
     options['filenames'] = options.get('filenames', [])
 

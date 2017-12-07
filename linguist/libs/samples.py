@@ -4,8 +4,8 @@ from os import listdir
 from os.path import realpath, dirname, exists, join, splitext
 from collections import defaultdict
 
-from classifier import Classifier
-from md5 import MD5
+from linguist.libs.classifier import Classifier
+from linguist.libs.md5 import MD5
 
 DIR = dirname(realpath(__file__))
 ROOT = join(dirname(dirname(DIR)), "samples")

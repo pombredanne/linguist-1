@@ -27,7 +27,7 @@ MULTI_LINE_COMMENTS = [
     [r'/*', r'*/'],     # C
     [r'<!--', r'-->'],  # XML
     [r'{-', r'-}'],     # Haskell
-    [r'(*', r'*)'],     # Coq
+#    [r'(*', r'*)'],     # Coq
     [r'"""', r'"""'],   # Python
     [r"'''", r"'''"],   # Python
 ]

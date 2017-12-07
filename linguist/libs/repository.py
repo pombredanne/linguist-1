@@ -3,10 +3,9 @@ import os
 import re
 from collections import defaultdict
 from functools import partial
-from itertools import imap
 
-from file_blob import FileBlob
-from language import Language
+from linguist.libs.file_blob import FileBlob
+from linguist.libs.language import Language
 
 
 class Repository(object):
@@ -45,7 +44,7 @@ class Repository(object):
         Returns a Repository
         """
         blob = partial(FileBlob, base_path=base_path)
-        enum = imap(blob, cls.get_files(base_path))
+        enum = map(blob, cls.get_files(base_path))
         return cls(enum)
 
     @staticmethod
@@ -122,7 +121,7 @@ class Repository(object):
         self._size = sum(self.sizes.itervalues())
 
         # Get primary language
-        primary = sorted(self.sizes.iteritems(), key=lambda t: t[1], reverse=True)
+        primary = sorted(self.sizes.items(), key=lambda t: t[1], reverse=True)
         if primary:
             self._language = primary[0][0]
 
